@@ -43,7 +43,7 @@ person = player(500,700,64,64)
 running = True
 
 while running:
-    clock.tick(60)
+    clock.tick(144)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -67,8 +67,8 @@ while running:
     if person.jump == True:
         if person.jumpTimer >= -(person.jumpTime):
             person.jumpTimer -= 1
-        if person.jumpTimer <= person.jumpTime or person.jumpTimer >= person.jumpTime:
-            person.y -= (person.jumpTimer ** 1)
+        if person.jumpTimer > -30:
+            person.y -= person.jumpTimer
         # elif person.jumpTimer < 0 and person.jumpTimer >= -(person.jumpTime):
         #     person.y -= (person.jumpTimer ** 1)
         else:
