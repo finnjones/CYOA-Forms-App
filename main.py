@@ -23,7 +23,7 @@ playerSpriteR = [pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/1
 bulletSprite = []
 
 bg = pygame.image.load(FlexyPath + "/wallpaper.png")
-
+lastFacing = "right"
 class player(object):
     
     def __init__(self, x, y, width, height):
@@ -36,15 +36,24 @@ class player(object):
         self.jumpTimer = 30
         self.jump = False
         self.changeSprite = 0
-        self.direction = "left"
 
     def draw(self, window, direction):
+        self.direction = direction
+        global lastFacing
         self.changeSprite += 1
-        print(self.changeSprite)
-        if direction == "left":
+
+        if direction == -1:
+            lastFacing = "left"
             window.blit(playerSpriteL[self.changeSprite//4], (self.x, self.y))
-        else:
+        elif direction == 1:
+            lastFacing = "right"
             window.blit(playerSpriteR[self.changeSprite//4], (self.x, self.y))
+        
+        else:
+            if lastFacing == "right":
+                window.blit(playerSpriteR[1], (self.x, self.y))
+            if lastFacing == "left":
+                window.blit(playerSpriteL[1], (self.x, self.y))
 
         if self.changeSprite > 26:
             self.changeSprite = -1
@@ -69,23 +78,25 @@ def reDraw(facing):
         if b.x < person.x + 600:
             b.draw(window)
     
-
-    
     pygame.display.update()
 
 person = player(500,700,64,64)
 
-bullets = []
+bullets = {}
 
 running = True
-facing = ""
+facing = 1
+wasFacing = 1
+
 while running:
     clock.tick(100)
-
-    for b in bullets:
+    
+    for b in list(bullets):
         if b.x < 1920 and b.x > -10:
-            b.x += b.vel
-
+            
+            b.x += b.vel * bullets[b]
+        else:
+            del bullets[b]
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -97,13 +108,18 @@ while running:
     if keys[pygame.K_ESCAPE]:
         running = False
 
-    elif keys[pygame.K_a]:
-        facing = "left"
-        person.x -= person.speed
+    if keys[pygame.K_a]:
+        facing = -1
+        wasFacing = -1
 
+        person.x -= person.speed
     elif keys[pygame.K_d]:
-        facing = "right"
+        facing = 1
+        wasFacing = 1
+
         person.x += person.speed
+    else:
+        facing = 0
     
     if keys[pygame.K_w]:
         person.jump = True
@@ -119,7 +135,9 @@ while running:
             person.jumpTimer = person.jumpTime
     
     if keys[pygame.K_p]:
-        bullets.append(bullet(person.x + person.width/2, person.y + person.height/2, 6, (0,0,0), 1))
+        bullets[bullet(person.x + person.width/2, person.y + person.height/2, 6, (0,0,0), 1)] = wasFacing
+        # print(bullets)
+
 
 
     reDraw(facing)
