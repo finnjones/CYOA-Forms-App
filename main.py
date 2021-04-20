@@ -14,12 +14,10 @@ pygame.display.set_caption("Game")
 
 clock = pygame.time.Clock()
 
+speechBubble = pygame.image.load(FlexyPath + "/Bubble.png")
 playerSprite = pygame.image.load(FlexyPath + "/Player.png")
 playerSpriteL = [pygame.image.load(FlexyPath + "/Sprites/1.png"), pygame.image.load(FlexyPath + "/Sprites/2.png"), pygame.image.load(FlexyPath + "/Sprites/3.png"), pygame.image.load(FlexyPath + "/Sprites/4.png"), pygame.image.load(FlexyPath + "/Sprites/5.png"), pygame.image.load(FlexyPath + "/Sprites/6.png"), pygame.image.load(FlexyPath + "/Sprites/7.png"), pygame.image.load(FlexyPath + "/Sprites/8.png")]
 playerSpriteR = [pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/1.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/2.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/3.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/4.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/5.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/6.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/7.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/8.png"), True, False), ]
-# for i in playerSpriteL:
-#     print
-# playerSpriteR
 bulletSprite = []
 
 bg = pygame.image.load(FlexyPath + "/wallpaper.png")
@@ -58,6 +56,8 @@ class player(object):
         if self.changeSprite > 26:
             self.changeSprite = -1
 
+
+
 class bullet(object):
     def __init__(self,x,y,radius,color,facing):
         self.x = x
@@ -67,20 +67,54 @@ class bullet(object):
         self.facing = facing
         self.vel = 20 * facing
 
-    def draw(self,win):
+    def draw(self,window):
         pygame.draw.circle(window, self.color, (self.x,self.y), self.radius)
 
+class speech(object):
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+
+    def draw(self,window):
+        window.blit(speechBubble, (self.x, self.y))
+
+
+# class words(object):
+#     def __init__(self, text, fontSize, textloc, colour):
+#         self.text = text
+#         self.fontSize = fontSize
+#         self.textloc = textloc
+#         self.colour = colour
+#         self.Font = pygame.font.Font(FlexyPath+'/Quicksand-VariableFont_wght.ttf', fontSize)
+#         self.finalText, self.textLoc = textRender(self.text, self.Font , self.colour)
+#         window.blit(self.finalText, self.textloc)
+def textRender(text, font , colour):
+    textSurface = font.render(text, True, colour)
+    return textSurface, textSurface.get_rect()
+
+def showText(text, fontSize, textloc, colour):
+    Font = pygame.font.Font(FlexyPath+'/Quicksand/Quicksand-VariableFont_wght.ttf', fontSize)
+    finalText, textLoc = textRender(text, Font , colour)
+    window.blit(finalText, textloc)
 
 def reDraw(facing):
     window.blit(bg,(0,0))
     person.draw(window, facing)
+    speechCloud.x = person.x + 65
+    speechCloud.y = person.y - 135
+
+    speechCloud.draw(window)
+    showText("hello", 20, (speechCloud.x+ 50, speechCloud.y + 10), black)
+
     for b in bullets:
         if b.x < person.x + 600:
             b.draw(window)
     
     pygame.display.update()
 
+
 person = player(500,700,64,64)
+speechCloud = speech(100,100)
 
 bullets = {}
 
@@ -146,7 +180,3 @@ while running:
 
 
 pygame.quit()
-
-
-
-
