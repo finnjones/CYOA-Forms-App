@@ -97,14 +97,17 @@ def showText(text, fontSize, textloc, colour):
     finalText, textLoc = textRender(text, Font , colour)
     window.blit(finalText, textloc)
 
+def speechF(text):
+    speechCloud.x = person.x + 65
+    speechCloud.y = person.y - 135
+    speechCloud.draw(window)
+    showText(text, 20, (speechCloud.x+ 50, speechCloud.y + 10), black)
+
+
 def reDraw(facing):
     window.blit(bg,(0,0))
     person.draw(window, facing)
-    speechCloud.x = person.x + 65
-    speechCloud.y = person.y - 135
-
-    speechCloud.draw(window)
-    showText("hello", 20, (speechCloud.x+ 50, speechCloud.y + 10), black)
+    speechF("hello")
 
     for b in bullets:
         if b.x < person.x + 600:
@@ -170,7 +173,6 @@ while running:
     
     if keys[pygame.K_p]:
         bullets[bullet(person.x + person.width/2, person.y + person.height/2, 6, (0,0,0), 1)] = wasFacing
-        # print(bullets)
 
 
 
