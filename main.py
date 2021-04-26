@@ -1,4 +1,4 @@
-import pygame, os
+import pygame, os, time
 pygame.init()
 
 black = (0, 0, 0)
@@ -19,7 +19,8 @@ playerSprite = pygame.image.load(FlexyPath + "/Player.png")
 playerSpriteL = [pygame.image.load(FlexyPath + "/Sprites/1.png"), pygame.image.load(FlexyPath + "/Sprites/2.png"), pygame.image.load(FlexyPath + "/Sprites/3.png"), pygame.image.load(FlexyPath + "/Sprites/4.png"), pygame.image.load(FlexyPath + "/Sprites/5.png"), pygame.image.load(FlexyPath + "/Sprites/6.png"), pygame.image.load(FlexyPath + "/Sprites/7.png"), pygame.image.load(FlexyPath + "/Sprites/8.png")]
 playerSpriteR = [pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/1.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/2.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/3.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/4.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/5.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/6.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/7.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/8.png"), True, False), ]
 bulletSprite = []
-
+steveSprite = pygame.image.load(FlexyPath + "/SteveJobs.png")
+kd = False
 bg = pygame.image.load(FlexyPath + "/wallpaper.png")
 lastFacing = "right"
 class player(object):
@@ -34,6 +35,8 @@ class player(object):
         self.jumpTimer = 30
         self.jump = False
         self.changeSprite = 0
+        self.hitbox = (self.x + 17, self.y + 2, self.width, self.height)
+
 
     def draw(self, window, direction):
         self.direction = direction
@@ -56,7 +59,26 @@ class player(object):
         if self.changeSprite > 26:
             self.changeSprite = -1
 
+        self.hitbox = (self.x + 17, self.y + 2, self.width, self.height)
+        pygame.draw.rect(window, (255,0,0), self.hitbox,2)
 
+class npc(object):
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self. height = height
+        self.hitbox = (self.x, self.y, self.width, self.height)
+
+    def stevetext():
+        speechF("hello")
+
+    def draw(self, window):
+        window.blit(steveSprite, (self.x, self.y))
+        self.hitbox = (self.x, self.y, self.width, self.height)
+        pygame.draw.rect(window, (255,0,0), self.hitbox,2)
+
+    
 
 class bullet(object):
     def __init__(self,x,y,radius,color,facing):
@@ -79,15 +101,6 @@ class speech(object):
         window.blit(speechBubble, (self.x, self.y))
 
 
-# class words(object):
-#     def __init__(self, text, fontSize, textloc, colour):
-#         self.text = text
-#         self.fontSize = fontSize
-#         self.textloc = textloc
-#         self.colour = colour
-#         self.Font = pygame.font.Font(FlexyPath+'/Quicksand-VariableFont_wght.ttf', fontSize)
-#         self.finalText, self.textLoc = textRender(self.text, self.Font , self.colour)
-#         window.blit(self.finalText, self.textloc)
 def textRender(text, font , colour):
     textSurface = font.render(text, True, colour)
     return textSurface, textSurface.get_rect()
@@ -102,21 +115,29 @@ def speechF(text):
     speechCloud.y = person.y - 135
     speechCloud.draw(window)
     showText(text, 20, (speechCloud.x+ 50, speechCloud.y + 10), black)
+    # pygame.display.update()
 
 
 def reDraw(facing):
+    global kd
     window.blit(bg,(0,0))
     person.draw(window, facing)
-    speechF("hello")
+    if kd == True:
+        npc.stevetext()
+        kd = False
 
+        # speechF("hello")
+
+    
     for b in bullets:
         if b.x < person.x + 600:
             b.draw(window)
-    
+    steveNPC.draw(window)
     pygame.display.update()
 
 
-person = player(500,700,64,64)
+person = player(500,700,64,100)
+steveNPC = npc(1000,700,77, 143)
 speechCloud = speech(100,100)
 
 bullets = {}
@@ -124,7 +145,7 @@ bullets = {}
 running = True
 facing = 1
 wasFacing = 1
-
+kd = False
 while running:
     clock.tick(100)
     
@@ -154,6 +175,7 @@ while running:
         facing = 1
         wasFacing = 1
 
+
         person.x += person.speed
     else:
         facing = 0
@@ -171,9 +193,23 @@ while running:
             person.jump = False
             person.jumpTimer = person.jumpTime
     
-    if keys[pygame.K_p]:
+    if keys[pygame.K_i]:
         bullets[bullet(person.x + person.width/2, person.y + person.height/2, 6, (0,0,0), 1)] = wasFacing
+    
+    
 
+
+    if steveNPC.x != 700:
+        steveNPC.x -= 4
+
+    if person.hitbox[0] + person.hitbox[2] > steveNPC.hitbox[0] and person.hitbox[0] < steveNPC.hitbox[0] + steveNPC.hitbox[2]:
+        if person.hitbox[1] + person.hitbox[3] > steveNPC.hitbox[1] and person.hitbox[1] < steveNPC.hitbox[1] + steveNPC.hitbox[3]:
+            if keys[pygame.K_o]:
+                # print("hello")
+                kd = True
+            # speechF("hello")
+
+            # print(person.x)
 
 
     reDraw(facing)
