@@ -38,8 +38,6 @@ class player(object):
         self.hitbox = (self.x + 17, self.y + 2, self.width, self.height)
 
 
-    # def playerText(self):
-
     def draw(self, window, direction):
         self.direction = direction
         global lastFacing
@@ -47,7 +45,6 @@ class player(object):
             self.changeSprite = -1
         self.changeSprite += 1
         
-        print(self.changeSprite)
 
         if direction == -1:
             lastFacing = "left"
@@ -127,32 +124,55 @@ def speechF(text, attach):
         speechCloud.y = steveNPC.y - 135
     speechCloud.draw(window)
     showText(text, 20, (speechCloud.x + 50, speechCloud.y + 10), black)
+stopMove = ""
+
+def platforms(x,y):
+    pygame.draw.rect(window,black,(x,y,100,50))
+    hitbox = (x, y, 100, 50)
+
+    # if person.hitbox[0] + person.hitbox[2] > hitbox[0] and person.hitbox[0] < hitbox[0] + hitbox[2]:
+    #     if facing == 1:
+    #         stopMove = "right"
+    #     elif facing == -1:
+    #         stopMove = "left"
+    #     else:
+    #         stopMove = ""
+
+    if person.hitbox[0] + person.hitbox[2] > hitbox[0] and person.hitbox[0] < hitbox[0] + hitbox[2]:
+        if person.hitbox[1] + person.hitbox[3] > hitbox[1] and person.hitbox[1] < hitbox[1] + hitbox[3]:
+            person.jumpTimer = 30
+    print("facing")
+
+    if person.hitbox[0] + person.hitbox[2] < hitbox[0] and person.hitbox[0] > hitbox[0] + hitbox[2]:
+
+
+        if person.y != 1000:
+            person.y += 5
+
+
 
 
 def reDraw(facing):
     global kd
+
     window.blit(bg,(0,0))
-    person.draw(window, facing)
+    
+    platforms(200,500)
+
     if kd == True:
-        # npc.stevetext()
         speechF("hello, sup nerd", True)
         speechF("egg", False)
 
-
-
-        # kd = False
-
-
-    
     for b in bullets:
         if b.x < person.x + 600:
             b.draw(window)
+    person.draw(window, facing)
     steveNPC.draw(window)
     pygame.display.update()
 
 
-person = player(500,700,64,100)
-steveNPC = npc(1000,700,77, 143)
+person = player(500,700,100,130)
+steveNPC = npc(1930,700,77, 143)
 speechCloud = speech(100,100)
 
 bullets = {}
@@ -184,14 +204,13 @@ while running:
     if keys[pygame.K_a]:
         facing = -1
         wasFacing = -1
-
         person.x -= person.speed
+
     elif keys[pygame.K_d]:
         facing = 1
         wasFacing = 1
-
-
         person.x += person.speed
+
     else:
         facing = 0
     
@@ -209,15 +228,13 @@ while running:
             person.jumpTimer = person.jumpTime
     
     if keys[pygame.K_i]:
-        bullets[bullet(person.x + person.width/2, person.y + person.height/2, 6, (0,0,0), 1)] = wasFacing
-    
-    
+        bullets[bullet(person.x + person.width/2, person.y + person.height/2.8, 6, (0,0,0), 1)] = wasFacing
 
-
-    if steveNPC.x != 700:
+    if steveNPC.x > 1000:
         steveNPC.x -= 4
 
     if person.hitbox[0] + person.hitbox[2] > steveNPC.hitbox[0] and person.hitbox[0] < steveNPC.hitbox[0] + steveNPC.hitbox[2]:
+        
         if person.hitbox[1] + person.hitbox[3] > steveNPC.hitbox[1] and person.hitbox[1] < steveNPC.hitbox[1] + steveNPC.hitbox[3]:
             if keys[pygame.K_o]:
                 kd = True
