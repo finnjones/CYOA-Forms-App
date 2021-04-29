@@ -16,8 +16,8 @@ clock = pygame.time.Clock()
 
 speechBubble = pygame.image.load(FlexyPath + "/Bubble.png")
 playerSprite = pygame.image.load(FlexyPath + "/Player.png")
-playerSpriteL = [pygame.image.load(FlexyPath + "/Sprites/1.png"), pygame.image.load(FlexyPath + "/Sprites/2.png"), pygame.image.load(FlexyPath + "/Sprites/3.png"), pygame.image.load(FlexyPath + "/Sprites/4.png"), pygame.image.load(FlexyPath + "/Sprites/5.png"), pygame.image.load(FlexyPath + "/Sprites/6.png"), pygame.image.load(FlexyPath + "/Sprites/7.png"), pygame.image.load(FlexyPath + "/Sprites/8.png")]
-playerSpriteR = [pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/1.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/2.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/3.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/4.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/5.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/6.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/7.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/8.png"), True, False), ]
+playerSpriteL = [pygame.image.load(FlexyPath + "/Sprites/1.png"), pygame.image.load(FlexyPath + "/Sprites/2.png"), pygame.image.load(FlexyPath + "/Sprites/3.png"), pygame.image.load(FlexyPath + "/Sprites/4.png"), pygame.image.load(FlexyPath + "/Sprites/5.png"), pygame.image.load(FlexyPath + "/Sprites/6.png"), pygame.image.load(FlexyPath + "/Sprites/7.png"), pygame.image.load(FlexyPath + "/Sprites/8.png"), pygame.image.load(FlexyPath + "/Sprites/9.png"), pygame.image.load(FlexyPath + "/Sprites/10.png")]
+playerSpriteR = [pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/1.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/2.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/3.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/4.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/5.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/6.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/7.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/8.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/9.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/10.png"), True, False)]
 bulletSprite = []
 steveSprite = pygame.image.load(FlexyPath + "/SteveJobs.png")
 kd = False
@@ -43,23 +43,27 @@ class player(object):
     def draw(self, window, direction):
         self.direction = direction
         global lastFacing
+        if self.changeSprite > 48:
+            self.changeSprite = -1
         self.changeSprite += 1
+        
+        print(self.changeSprite)
 
         if direction == -1:
             lastFacing = "left"
-            window.blit(playerSpriteL[self.changeSprite//4], (self.x, self.y))
+            window.blit(playerSpriteL[self.changeSprite//5], (self.x, self.y))
         elif direction == 1:
             lastFacing = "right"
-            window.blit(playerSpriteR[self.changeSprite//4], (self.x, self.y))
+            window.blit(playerSpriteR[self.changeSprite//5], (self.x, self.y))
         
         else:
             if lastFacing == "right":
-                window.blit(playerSpriteR[1], (self.x, self.y))
+                window.blit(playerSpriteR[0], (self.x, self.y))
             if lastFacing == "left":
-                window.blit(playerSpriteL[1], (self.x, self.y))
+                window.blit(playerSpriteL[0], (self.x, self.y))
+                
 
-        if self.changeSprite > 26:
-            self.changeSprite = -1
+       
 
         self.hitbox = (self.x + 17, self.y + 2, self.width, self.height)
         pygame.draw.rect(window, (255,0,0), self.hitbox,2)
@@ -72,13 +76,14 @@ class npc(object):
         self. height = height
         self.hitbox = (self.x, self.y, self.width, self.height)
 
-    def stevetext():
-        speechF("hello, sup nerd")
+
     
 
     def draw(self, window):
         window.blit(steveSprite, (self.x, self.y))
         self.hitbox = (self.x, self.y, self.width, self.height)
+        showText("Press 'o' To Talk", 20, (steveNPC.x - 20, steveNPC.y - 30), black)
+
         pygame.draw.rect(window, (255,0,0), self.hitbox,2)
 
     
@@ -113,8 +118,8 @@ def showText(text, fontSize, textloc, colour):
     finalText, textLoc = textRender(text, Font , colour)
     window.blit(finalText, textloc)
 
-def speechF(text, person):
-    if person == True:
+def speechF(text, attach):
+    if attach == True:
         speechCloud.x = person.x + 65
         speechCloud.y = person.y - 135
     else:
