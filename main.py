@@ -38,6 +38,8 @@ class player(object):
         self.hitbox = (self.x + 17, self.y + 2, self.width, self.height)
 
 
+    # def playerText(self):
+
     def draw(self, window, direction):
         self.direction = direction
         global lastFacing
@@ -71,7 +73,8 @@ class npc(object):
         self.hitbox = (self.x, self.y, self.width, self.height)
 
     def stevetext():
-        speechF("hello")
+        speechF("hello, sup nerd")
+    
 
     def draw(self, window):
         window.blit(steveSprite, (self.x, self.y))
@@ -110,12 +113,15 @@ def showText(text, fontSize, textloc, colour):
     finalText, textLoc = textRender(text, Font , colour)
     window.blit(finalText, textloc)
 
-def speechF(text):
-    speechCloud.x = person.x + 65
-    speechCloud.y = person.y - 135
+def speechF(text, person):
+    if person == True:
+        speechCloud.x = person.x + 65
+        speechCloud.y = person.y - 135
+    else:
+        speechCloud.x = steveNPC.x + 65
+        speechCloud.y = steveNPC.y - 135
     speechCloud.draw(window)
-    showText(text, 20, (speechCloud.x+ 50, speechCloud.y + 10), black)
-    # pygame.display.update()
+    showText(text, 20, (speechCloud.x + 50, speechCloud.y + 10), black)
 
 
 def reDraw(facing):
@@ -123,10 +129,14 @@ def reDraw(facing):
     window.blit(bg,(0,0))
     person.draw(window, facing)
     if kd == True:
-        npc.stevetext()
-        kd = False
+        # npc.stevetext()
+        speechF("hello, sup nerd", True)
+        speechF("egg", False)
 
-        # speechF("hello")
+
+
+        # kd = False
+
 
     
     for b in bullets:
@@ -205,11 +215,8 @@ while running:
     if person.hitbox[0] + person.hitbox[2] > steveNPC.hitbox[0] and person.hitbox[0] < steveNPC.hitbox[0] + steveNPC.hitbox[2]:
         if person.hitbox[1] + person.hitbox[3] > steveNPC.hitbox[1] and person.hitbox[1] < steveNPC.hitbox[1] + steveNPC.hitbox[3]:
             if keys[pygame.K_o]:
-                # print("hello")
                 kd = True
-            # speechF("hello")
 
-            # print(person.x)
 
 
     reDraw(facing)
