@@ -125,10 +125,11 @@ def speechF(text, attach):
     speechCloud.draw(window)
     showText(text, 20, (speechCloud.x + 50, speechCloud.y + 10), black)
 stopMove = ""
-
-def platforms(x,y):
-    pygame.draw.rect(window,black,(x,y,100,50))
-    hitbox = (x, y, 100, 50)
+collide = False
+def platforms(x,y,width,height):
+    global collide
+    pygame.draw.rect(window,black,(x,y,width,height))
+    hitbox = (x, y, width, height)
 
     # if person.hitbox[0] + person.hitbox[2] > hitbox[0] and person.hitbox[0] < hitbox[0] + hitbox[2]:
     #     if facing == 1:
@@ -139,26 +140,23 @@ def platforms(x,y):
     #         stopMove = ""
 
     if person.hitbox[0] + person.hitbox[2] > hitbox[0] and person.hitbox[0] < hitbox[0] + hitbox[2]:
+        print("xcross")
         if person.hitbox[1] + person.hitbox[3] > hitbox[1] and person.hitbox[1] < hitbox[1] + hitbox[3]:
-            person.jumpTimer = 30
-    print("facing")
+            print("ycross")
+            collide
 
-    if person.hitbox[0] + person.hitbox[2] < hitbox[0] and person.hitbox[0] > hitbox[0] + hitbox[2]:
-
-
-        if person.y != 1000:
-            person.y += 5
+        
 
 
 
 
 def reDraw(facing):
     global kd
-
     window.blit(bg,(0,0))
-    
-    platforms(200,500)
-
+    platforms(700,800,100,50)
+    platforms(500,800,100,50)
+    # platforms(500,900,500,50)
+    # print(collide)
     if kd == True:
         speechF("hello, sup nerd", True)
         speechF("egg", False)
@@ -176,7 +174,7 @@ steveNPC = npc(1930,700,77, 143)
 speechCloud = speech(100,100)
 
 bullets = {}
-
+inair = False
 running = True
 facing = 1
 wasFacing = 1
@@ -217,15 +215,29 @@ while running:
     if keys[pygame.K_w]:
         person.jump = True
 
-    if person.jump == True:
-        if person.jumpTimer >= -(person.jumpTime):
-            person.jumpTimer -= 1.5
+    if person.jump == True and inair == False:
         if person.jumpTimer > -(person.jumpTime):
+            person.jumpTimer -= 1.5
             person.y -= person.jumpTimer
-
+            # print(person.jumpTimer)
         else:
             person.jump = False
-            person.jumpTimer = person.jumpTime
+            person.jumpTimer = person.jumpTime + 1.5
+
+
+        
+            
+
+    # else:
+    #     person.jumpTimer = person.jumpTime
+    #     person.jump = False
+
+        # if person.jumpTimer > -(person.jumpTime):
+        #     person.y -= person.jumpTimer
+
+        # else:
+        #     person.jump = False
+        #     person.jumpTimer = person.jumpTime
     
     if keys[pygame.K_i]:
         bullets[bullet(person.x + person.width/2, person.y + person.height/2.8, 6, (0,0,0), 1)] = wasFacing
