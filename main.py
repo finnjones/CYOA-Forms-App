@@ -9,7 +9,7 @@ red = (255, 0, 0)
 FlexyPath = os.path.dirname(os.path.abspath(__file__))
 
 
-window = pygame.display.set_mode((1920 , 1080))
+window = pygame.display.set_mode((1920 , 1000))
 pygame.display.set_caption("Game")
 
 clock = pygame.time.Clock()
@@ -20,9 +20,13 @@ playerSpriteL = [pygame.image.load(FlexyPath + "/Sprites/1.png"), pygame.image.l
 playerSpriteR = [pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/1.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/2.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/3.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/4.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/5.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/6.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/7.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/8.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/9.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/10.png"), True, False)]
 bulletSprite = []
 steveSprite = pygame.image.load(FlexyPath + "/SteveJobs.png")
+pygame.mixer.music.load(FlexyPath +'/gameSong.wav')
+pygame.mixer.music.play(-1)
+
 kd = False
 bg = pygame.image.load(FlexyPath + "/wallpaper.png")
 lastFacing = "right"
+
 class player(object):
     
     def __init__(self, x, y, width, height):
@@ -131,32 +135,21 @@ def platforms(x,y,width,height):
     pygame.draw.rect(window,black,(x,y,width,height))
     hitbox = (x, y, width, height)
 
-    # if person.hitbox[0] + person.hitbox[2] > hitbox[0] and person.hitbox[0] < hitbox[0] + hitbox[2]:
-    #     if facing == 1:
-    #         stopMove = "right"
-    #     elif facing == -1:
-    #         stopMove = "left"
-    #     else:
-    #         stopMove = ""
 
     if person.hitbox[0] + person.hitbox[2] > hitbox[0] and person.hitbox[0] < hitbox[0] + hitbox[2]:
-        print("xcross")
         if person.hitbox[1] + person.hitbox[3] > hitbox[1] and person.hitbox[1] < hitbox[1] + hitbox[3]:
-            print("ycross")
-            collide
-
-        
-
-
-
+            print(person.y)
+            person.jump = False
+            person.jumpTimer = person.jumpTime
+            collide = True
 
 def reDraw(facing):
     global kd
     window.blit(bg,(0,0))
-    platforms(700,800,100,50)
-    platforms(500,800,100,50)
-    # platforms(500,900,500,50)
-    # print(collide)
+    platforms(700,500,100,50)
+    platforms(300,500,100,50)
+    platforms(0,950,1920,50)
+
     if kd == True:
         speechF("hello, sup nerd", True)
         speechF("egg", False)
@@ -166,10 +159,12 @@ def reDraw(facing):
             b.draw(window)
     person.draw(window, facing)
     steveNPC.draw(window)
+    pygame.display.flip()
+
     pygame.display.update()
 
 
-person = player(500,700,100,130)
+person = player(500,600,100,130)
 steveNPC = npc(1930,700,77, 143)
 speechCloud = speech(100,100)
 
@@ -213,31 +208,16 @@ while running:
         facing = 0
     
     if keys[pygame.K_w]:
-        person.jump = True
+        if collide == True:
+            person.jump = True
 
     if person.jump == True and inair == False:
         if person.jumpTimer > -(person.jumpTime):
             person.jumpTimer -= 1.5
             person.y -= person.jumpTimer
-            # print(person.jumpTimer)
         else:
             person.jump = False
             person.jumpTimer = person.jumpTime + 1.5
-
-
-        
-            
-
-    # else:
-    #     person.jumpTimer = person.jumpTime
-    #     person.jump = False
-
-        # if person.jumpTimer > -(person.jumpTime):
-        #     person.y -= person.jumpTimer
-
-        # else:
-        #     person.jump = False
-        #     person.jumpTimer = person.jumpTime
     
     if keys[pygame.K_i]:
         bullets[bullet(person.x + person.width/2, person.y + person.height/2.8, 6, (0,0,0), 1)] = wasFacing
@@ -252,10 +232,17 @@ while running:
                 kd = True
 
 
+    if collide == False and person.jump == False:
+        if person.jumpTimer == person.jumpTime:
+            person.jumpTimer = 0
 
+
+        person.jumpTimer -= 1.5
+        
+        person.y -= person.jumpTimer
+        
+    else:
+        collide = False
     reDraw(facing)
-
-
-
 
 pygame.quit()
