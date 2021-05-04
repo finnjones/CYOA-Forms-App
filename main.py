@@ -119,7 +119,7 @@ def showText(text, fontSize, textloc, colour):
     finalText, textLoc = textRender(text, Font , colour)
     window.blit(finalText, textloc)
 
-def speechF(text, attach):
+def speechF(text, text2,text3, attach):
     if attach == True:
         speechCloud.x = person.x + 65
         speechCloud.y = person.y - 135
@@ -127,7 +127,9 @@ def speechF(text, attach):
         speechCloud.x = steveNPC.x + 65
         speechCloud.y = steveNPC.y - 135
     speechCloud.draw(window)
-    showText(text, 20, (speechCloud.x + 50, speechCloud.y + 10), black)
+    showText(text, 20, (speechCloud.x + 50, speechCloud.y + 15), black)
+    showText(text2, 20, (speechCloud.x + 50, speechCloud.y + 30), black)
+    showText(text3, 20, (speechCloud.x + 50, speechCloud.y + 45), black)
 stopMove = ""
 collide = False
 def platforms(x,y,width,height):
@@ -135,14 +137,20 @@ def platforms(x,y,width,height):
     pygame.draw.rect(window,black,(x,y,width,height))
     hitbox = (x, y, width, height)
 
-
     if person.hitbox[0] + person.hitbox[2] > hitbox[0] and person.hitbox[0] < hitbox[0] + hitbox[2]:
         if person.hitbox[1] + person.hitbox[3] > hitbox[1] and person.hitbox[1] < hitbox[1] + hitbox[3]:
-            print(person.y)
+            if person.hitbox[1] + person.hitbox[3] - person.jumpTimer > hitbox[1] and person.hitbox[1] + person.height < hitbox[1] and collide == False:
+                person.y = hitbox[1] - person.height
+    if person.hitbox[0] + person.hitbox[2] > hitbox[0] and person.hitbox[0] < hitbox[0] + hitbox[2]:
+        if person.hitbox[1] + person.hitbox[3] > hitbox[1] and person.hitbox[1] < hitbox[1] + hitbox[3]:
+            if person.jump == False and person.hitbox[1] + person.hitbox[3] - hitbox[1] > 10:
+                if person.y != hitbox[1] - person.height:
+                    person.y -= 20
+
             person.jump = False
             person.jumpTimer = person.jumpTime
+            
             collide = True
-
 def reDraw(facing):
     global kd
     window.blit(bg,(0,0))
@@ -151,8 +159,8 @@ def reDraw(facing):
     platforms(0,950,1920,50)
 
     if kd == True:
-        speechF("hello, sup nerd", True)
-        speechF("egg", False)
+        speechF("You want","to watch a movie","do you pirate it?", False)
+        speechF("Hello","","",  True)
 
     for b in bullets:
         if b.x < person.x + 600:
@@ -164,8 +172,8 @@ def reDraw(facing):
     pygame.display.update()
 
 
-person = player(500,600,100,130)
-steveNPC = npc(1930,700,77, 143)
+person = player(500,810,100,130)
+steveNPC = npc(1930,810,77, 143)
 speechCloud = speech(100,100)
 
 bullets = {}
@@ -217,7 +225,6 @@ while running:
             person.y -= person.jumpTimer
         else:
             person.jump = False
-            person.jumpTimer = person.jumpTime + 1.5
     
     if keys[pygame.K_i]:
         bullets[bullet(person.x + person.width/2, person.y + person.height/2.8, 6, (0,0,0), 1)] = wasFacing
@@ -233,11 +240,13 @@ while running:
 
 
     if collide == False and person.jump == False:
-        if person.jumpTimer == person.jumpTime:
+        print(person.jumpTimer)
+        if person.jumpTimer > 0:
             person.jumpTimer = 0
+        
 
-
-        person.jumpTimer -= 1.5
+        if person.jumpTimer > -40:
+            person.jumpTimer -= 1.5
         
         person.y -= person.jumpTimer
         
