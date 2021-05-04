@@ -10,7 +10,7 @@ red = (255, 0, 0)
 FlexyPath = os.path.dirname(os.path.abspath(__file__))
 
 
-window = pygame.display.set_mode((1920 , 1000))
+window = pygame.display.set_mode((1620 , 1000))
 pygame.display.set_caption("Game")
 
 clock = pygame.time.Clock()
@@ -30,21 +30,22 @@ for i in actionImgL2:
 playerSpriteL = [pygame.image.load(FlexyPath + "/Sprites/1.png"), pygame.image.load(FlexyPath + "/Sprites/2.png"), pygame.image.load(FlexyPath + "/Sprites/3.png"), pygame.image.load(FlexyPath + "/Sprites/4.png"), pygame.image.load(FlexyPath + "/Sprites/5.png"), pygame.image.load(FlexyPath + "/Sprites/6.png"), pygame.image.load(FlexyPath + "/Sprites/7.png"), pygame.image.load(FlexyPath + "/Sprites/8.png"), pygame.image.load(FlexyPath + "/Sprites/9.png"), pygame.image.load(FlexyPath + "/Sprites/10.png")]
 playerSpriteR = [pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/1.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/2.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/3.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/4.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/5.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/6.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/7.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/8.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/9.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/10.png"), True, False)]
 bulletSprite = []
+zombieSprite = pygame.image.load(FlexyPath + "/Sprites/Zombie.png")
 steveSprite = pygame.image.load(FlexyPath + "/Sprites/SteveJobs.png")
 pygame.mixer.music.load(FlexyPath +'/gameSong.wav')
 pygame.mixer.music.play(-1)
 
 kd = False
-bg = pygame.image.load(FlexyPath + "/Images/pirate.png")
+bg = pygame.image.load(FlexyPath + "/Images/wallpaper.png")
 bg = pygame.transform.scale(bg, (1920, 1080))
 lastFacing = "right"
 f=open(FlexyPath + "/data.txt", "r")
 contents = f.read()
 f.close()
-contents.split()
-level = contents[0]
-ethicsScore = contents[1]
-
+contents = contents.split()
+level = int(contents[0])
+ethicsScore = int(contents[1])
+bulletColl = False
 
 class player(object):
     
@@ -86,7 +87,6 @@ class player(object):
        
 
         self.hitbox = (self.x + 17, self.y + 2, self.width, self.height)
-        pygame.draw.rect(window, (255,0,0), self.hitbox,2)
 
 class npc(object):
     def __init__(self, x, y, width, height):
@@ -104,7 +104,6 @@ class npc(object):
         self.hitbox = (self.x, self.y, self.width, self.height)
         showText("Press 'o' To Talk", 20, (steveNPC.x - 20, steveNPC.y - 30), black)
 
-        pygame.draw.rect(window, (255,0,0), self.hitbox,2)
 
     
 
@@ -139,22 +138,43 @@ def showText(text, fontSize, textloc, colour):
     window.blit(finalText, textloc)
 
 def actionQuestions():
+    global ethicsScore
+    global level
+    global kd
+    global bulletColl
     actionImgHit = [100, 100, 100, 100]
-    actionImgHit2 = [1700, 100, 100, 100]
-    window.blit(actionImg[0], (100,100))
-    window.blit(actionImg2[0], (1700,100))
-
+    actionImgHit2 = [1500, 100, 100, 100]
+    try:
+        window.blit(actionImg[level - 1], (100,100))
+        window.blit(actionImg2[level - 1], (1500,100))
+    except:
+        print("GameOver")
     if person.hitbox[0] + person.hitbox[2] > actionImgHit[0] and person.hitbox[0] < actionImgHit[0] + actionImgHit[2]:   
         if person.hitbox[1] + person.hitbox[3] > actionImgHit[1] and person.hitbox[1] < actionImgHit[1] + actionImgHit[3]:
-            print("left")
             ethicsScore += 10
             level += 1
+            kd = False
+            bulletColl = False
+            person.x = 100
+            person.y = 810
+            person.jumpTimer = person.jumpTime
+
+            save()
 
     if person.hitbox[0] + person.hitbox[2] > actionImgHit2[0] and person.hitbox[0] < actionImgHit2[0] + actionImgHit2[2]:   
         if person.hitbox[1] + person.hitbox[3] > actionImgHit2[1] and person.hitbox[1] < actionImgHit2[1] + actionImgHit2[3]:
-            print("right")
             ethicsScore -= 10
             level += 1
+            kd = False
+            bulletColl = False
+            person.x = 100
+            person.y = 810
+            person.jumpTimer = person.jumpTime
+
+            save()
+
+def zombie(x,y):
+    window.blit(zombieSprite, (x,y))
 
 def speechF(text, text2,text3, text4, attach):
     if attach == True:
@@ -198,16 +218,19 @@ def save():
 
 def reDraw(facing):
     global kd
-    print(person.y)
-    print(person.jumpTimer)
+    global bulletColl
+
     window.blit(bg,(0,0))
-    platforms(1300,700,100,50)
-    platforms(1700,300,100,50)
+    if bulletColl == False:
+        zombie(600,620)
+
+    platforms(1200,700,100,50)
+    platforms(1500,400,100,50)
     platforms(600,700,100,50)
-    platforms(200,300,100,50)
+    platforms(200,400,100,50)
     platforms(0,950,1920,50)
     actionQuestions()
-    showText("Ethics Score", ethicsScore, 20, (960, 100), black)
+    showText("Ethics Score: " + str(ethicsScore), 50, (700, 100), black)
     if kd == True:
         if level == 1:
             speechF("Hello","","","",  True)
@@ -239,27 +262,9 @@ def reDraw(facing):
         elif level == 10:
             speechF("Mr Shen has","given me an","assignment","",  True)
             speechF("Would you like","to copy and","the whole thing","", False)
-
-
-
-
-        # elif level[0] == 0:
-        #     # speechF("Hello","","","",  True)
-        #     speechF("You see the","login screen do","you use your account","or your friends", False)
-        #     if level[1] == 0:
-        #         speechF("That movie was","TRASH","","",  True)
-        #         speechF("Do you call","consumer support","to get a refund?","", False)
-
-        # elif level[0] == 1:
-        #     speechF("Hey pirating","this movie gave","me a virus","",  True)
-        #     speechF("Would you like","to get a tech","nerd to fix it","or DIY", False)
-        #     elif level[1] == 1:
-        #         speechF("Hey the pirating","this movie gave","me a virus","",  True)
-        #         speechF("Would you like","to get a tech","nerd to fix it","or DIY", False)
-
-        # elif level[2] == 0:
-        #     speechF("Hey the pirating","this movie gave","me a virus","",  True)
-        #     speechF("Would you like","to get a tech","nerd to fix it","or DIY", False)
+    elif level > 10:
+        showText("Game Over", 70, (700, 500), black)
+        
 
         
 
@@ -301,6 +306,10 @@ while running:
 
             
     if keys[pygame.K_ESCAPE]:
+        if level > 10:
+            level = 1
+            ethicsScore = 0
+        save()
         running = False
 
     if keys[pygame.K_a]:
@@ -339,6 +348,17 @@ while running:
             if keys[pygame.K_o]:
                 kd = True
 
+    if person.hitbox[0] + person.hitbox[2] > 620 and person.hitbox[0] < 620 + 113:
+        
+        if person.hitbox[1] + person.hitbox[3] > 600 and person.hitbox[1] < 600 + 83 and bulletColl == False:
+            person.x = 100
+            person.y = 810
+            person.jumpTimer = person.jumpTime
+    
+    for b in list(bullets):
+        if 620 + 113 > b.x and 620 < b.x:   
+            if 600 + 83 > b.y and 600 < b.y:
+                bulletColl = True
 
     if collide == False and person.jump == False:
         if person.jumpTimer > 0:
@@ -353,5 +373,13 @@ while running:
     else:
         collide = False
     reDraw(facing)
+
+    if person.y > 1000:
+        person.x = 100
+        person.y = 810
+        person.jumpTimer = person.jumpTime
+
+
+    
 
 pygame.quit()
