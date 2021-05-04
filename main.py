@@ -3,7 +3,8 @@ pygame.init()
 
 black = (0, 0, 0)
 white = (255, 255, 255)
-green = (0, 255, 0)
+green = (0, 128, 0)
+brown = (139,69,19)
 red = (255, 0, 0)
 
 FlexyPath = os.path.dirname(os.path.abspath(__file__))
@@ -14,18 +15,36 @@ pygame.display.set_caption("Game")
 
 clock = pygame.time.Clock()
 
-speechBubble = pygame.image.load(FlexyPath + "/Bubble.png")
-playerSprite = pygame.image.load(FlexyPath + "/Player.png")
+speechBubble = pygame.image.load(FlexyPath + "/Images/Bubble.png")
+actionImgL = [pygame.image.load(FlexyPath + "/Images/ActionImages/apple.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/money.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/money.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/repair.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/hand.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/slide.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/return.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/no.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/no.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/no.png")]
+actionImgL2 = [pygame.image.load(FlexyPath + "/Images/ActionImages/torrent.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/ADB.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/matrix.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/steal.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/sell.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/ddos.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/matrix.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/connect.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/matrix.png"), pygame.image.load(FlexyPath + "/Images/ActionImages/plagerise.png")]
+actionImg = []
+actionImg2 = []
+for i in actionImgL:
+    i = pygame.transform.scale(i, (100, 100))
+    actionImg.append(i)
+for i in actionImgL2:
+    i = pygame.transform.scale(i, (100, 100))
+    actionImg2.append(i)
+
 playerSpriteL = [pygame.image.load(FlexyPath + "/Sprites/1.png"), pygame.image.load(FlexyPath + "/Sprites/2.png"), pygame.image.load(FlexyPath + "/Sprites/3.png"), pygame.image.load(FlexyPath + "/Sprites/4.png"), pygame.image.load(FlexyPath + "/Sprites/5.png"), pygame.image.load(FlexyPath + "/Sprites/6.png"), pygame.image.load(FlexyPath + "/Sprites/7.png"), pygame.image.load(FlexyPath + "/Sprites/8.png"), pygame.image.load(FlexyPath + "/Sprites/9.png"), pygame.image.load(FlexyPath + "/Sprites/10.png")]
 playerSpriteR = [pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/1.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/2.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/3.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/4.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/5.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/6.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/7.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/8.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/9.png"), True, False), pygame.transform.flip(pygame.image.load(FlexyPath + "/Sprites/10.png"), True, False)]
 bulletSprite = []
-steveSprite = pygame.image.load(FlexyPath + "/SteveJobs.png")
+steveSprite = pygame.image.load(FlexyPath + "/Sprites/SteveJobs.png")
 pygame.mixer.music.load(FlexyPath +'/gameSong.wav')
 pygame.mixer.music.play(-1)
 
 kd = False
-bg = pygame.image.load(FlexyPath + "/wallpaper.png")
+bg = pygame.image.load(FlexyPath + "/Images/pirate.png")
+bg = pygame.transform.scale(bg, (1920, 1080))
 lastFacing = "right"
+f=open(FlexyPath + "/data.txt", "r")
+contents = f.read()
+f.close()
+contents.split()
+level = contents[0]
+ethicsScore = contents[1]
+
 
 class player(object):
     
@@ -119,7 +138,25 @@ def showText(text, fontSize, textloc, colour):
     finalText, textLoc = textRender(text, Font , colour)
     window.blit(finalText, textloc)
 
-def speechF(text, text2,text3, attach):
+def actionQuestions():
+    actionImgHit = [100, 100, 100, 100]
+    actionImgHit2 = [1700, 100, 100, 100]
+    window.blit(actionImg[0], (100,100))
+    window.blit(actionImg2[0], (1700,100))
+
+    if person.hitbox[0] + person.hitbox[2] > actionImgHit[0] and person.hitbox[0] < actionImgHit[0] + actionImgHit[2]:   
+        if person.hitbox[1] + person.hitbox[3] > actionImgHit[1] and person.hitbox[1] < actionImgHit[1] + actionImgHit[3]:
+            print("left")
+            ethicsScore += 10
+            level += 1
+
+    if person.hitbox[0] + person.hitbox[2] > actionImgHit2[0] and person.hitbox[0] < actionImgHit2[0] + actionImgHit2[2]:   
+        if person.hitbox[1] + person.hitbox[3] > actionImgHit2[1] and person.hitbox[1] < actionImgHit2[1] + actionImgHit2[3]:
+            print("right")
+            ethicsScore -= 10
+            level += 1
+
+def speechF(text, text2,text3, text4, attach):
     if attach == True:
         speechCloud.x = person.x + 65
         speechCloud.y = person.y - 135
@@ -130,37 +167,101 @@ def speechF(text, text2,text3, attach):
     showText(text, 20, (speechCloud.x + 50, speechCloud.y + 15), black)
     showText(text2, 20, (speechCloud.x + 50, speechCloud.y + 30), black)
     showText(text3, 20, (speechCloud.x + 50, speechCloud.y + 45), black)
+    showText(text4, 20, (speechCloud.x + 50, speechCloud.y + 60), black)
 stopMove = ""
 collide = False
 def platforms(x,y,width,height):
     global collide
-    pygame.draw.rect(window,black,(x,y,width,height))
+    pygame.draw.rect(window,brown,(x,y,width,height))
+    pygame.draw.rect(window,green,(x,y,width,height / 3))
     hitbox = (x, y, width, height)
+    if person.hitbox[0] + person.hitbox[2] > hitbox[0] and person.hitbox[0] < hitbox[0] + hitbox[2]:
+        if person.hitbox[1] + person.height >= hitbox[1] and person.hitbox[1] + person.height < hitbox[1] + hitbox[3] / 2 and person.jump == False:
+            person.y = hitbox[1] - person.height
 
-    if person.hitbox[0] + person.hitbox[2] > hitbox[0] and person.hitbox[0] < hitbox[0] + hitbox[2]:
-        if person.hitbox[1] + person.hitbox[3] > hitbox[1] and person.hitbox[1] < hitbox[1] + hitbox[3]:
-            if person.hitbox[1] + person.hitbox[3] - person.jumpTimer > hitbox[1] and person.hitbox[1] + person.height < hitbox[1] and collide == False:
-                person.y = hitbox[1] - person.height
-    if person.hitbox[0] + person.hitbox[2] > hitbox[0] and person.hitbox[0] < hitbox[0] + hitbox[2]:
-        if person.hitbox[1] + person.hitbox[3] > hitbox[1] and person.hitbox[1] < hitbox[1] + hitbox[3]:
-            if person.jump == False and person.hitbox[1] + person.hitbox[3] - hitbox[1] > 10:
+        elif person.jump == False:
+            if person.hitbox[1] + person.hitbox[3] - hitbox[1] > 10:
                 if person.y != hitbox[1] - person.height:
                     person.y -= 20
 
+        if person.hitbox[1] + person.hitbox[3] > hitbox[1] and person.hitbox[1] < hitbox[1] + hitbox[3]:
             person.jump = False
             person.jumpTimer = person.jumpTime
             
             collide = True
+
+def save():
+    global level
+    global ethicsScore
+    f = open(FlexyPath + '/data.txt','w')
+    f.write(str(level)+ " " + str(ethicsScore))
+
 def reDraw(facing):
     global kd
+    print(person.y)
+    print(person.jumpTimer)
     window.blit(bg,(0,0))
-    platforms(700,500,100,50)
-    platforms(300,500,100,50)
+    platforms(1300,700,100,50)
+    platforms(1700,300,100,50)
+    platforms(600,700,100,50)
+    platforms(200,300,100,50)
     platforms(0,950,1920,50)
-
+    actionQuestions()
+    showText("Ethics Score", ethicsScore, 20, (960, 100), black)
     if kd == True:
-        speechF("You want","to watch a movie","do you pirate it?", False)
-        speechF("Hello","","",  True)
+        if level == 1:
+            speechF("Hello","","","",  True)
+            speechF("You want to","watch a movie do","you pirate it or","rent on Apple TV?", False)
+        elif level == 2:
+            speechF("I don't like","the ads on","youtube","",  True)
+            speechF("Use an ad","blocker or pay","for premium","", False)
+        elif level == 3:
+            speechF("I really like","the look of","the new game","cyberpunk 2077",  True)
+            speechF("Would you like","to buy the","full version or","crack the game", False)
+        elif level == 4:
+            speechF("Dam I just","dropped and smashed","my new phone","",  True)
+            speechF("Would you like","to steal your","mates screen or","buy a new one", False)
+        elif level == 5:
+            speechF("Hey I found","this cool usb","it has a bunch","of paid software",  True)
+            speechF("Would you like","to hand in","the usb or","sell it on ebay", False)
+        elif level == 6:
+            speechF("I am angry","at someone for","bad mouthing me","",  True)
+            speechF("Would you like","to ddos their","computer or","let it slide", False)
+        elif level == 7:
+            speechF("Someone dropped","their credit card","on the ground","",  True)
+            speechF("Do you use","brute force attack","to find their","pin or return", False)
+        elif level == 8:
+            speechF("The neighbours","wifi makes it","to my house","",  True)
+            speechF("Would you like","to connect to","their internet","", False)
+        elif level == 9:
+            speechF("The mcdonalds wifi","is completely","unprotected","",  True)
+            speechF("Would you like","to perform a","man in the","middle attack", False)
+        elif level == 10:
+            speechF("Mr Shen has","given me an","assignment","",  True)
+            speechF("Would you like","to copy and","the whole thing","", False)
+
+
+
+
+        # elif level[0] == 0:
+        #     # speechF("Hello","","","",  True)
+        #     speechF("You see the","login screen do","you use your account","or your friends", False)
+        #     if level[1] == 0:
+        #         speechF("That movie was","TRASH","","",  True)
+        #         speechF("Do you call","consumer support","to get a refund?","", False)
+
+        # elif level[0] == 1:
+        #     speechF("Hey pirating","this movie gave","me a virus","",  True)
+        #     speechF("Would you like","to get a tech","nerd to fix it","or DIY", False)
+        #     elif level[1] == 1:
+        #         speechF("Hey the pirating","this movie gave","me a virus","",  True)
+        #         speechF("Would you like","to get a tech","nerd to fix it","or DIY", False)
+
+        # elif level[2] == 0:
+        #     speechF("Hey the pirating","this movie gave","me a virus","",  True)
+        #     speechF("Would you like","to get a tech","nerd to fix it","or DIY", False)
+
+        
 
     for b in bullets:
         if b.x < person.x + 600:
@@ -172,7 +273,7 @@ def reDraw(facing):
     pygame.display.update()
 
 
-person = player(500,810,100,130)
+person = player(100,810,100,130)
 steveNPC = npc(1930,810,77, 143)
 speechCloud = speech(100,100)
 
@@ -240,10 +341,9 @@ while running:
 
 
     if collide == False and person.jump == False:
-        print(person.jumpTimer)
         if person.jumpTimer > 0:
             person.jumpTimer = 0
-        
+
 
         if person.jumpTimer > -40:
             person.jumpTimer -= 1.5
